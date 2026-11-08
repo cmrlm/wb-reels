@@ -7,9 +7,11 @@ const path = require('path');
 const { spawn } = require('child_process');
 
 const ROOT = path.resolve(__dirname, '..');
-const [naskahPath, outDir] = process.argv.slice(2);
-if (!naskahPath || !outDir) { console.error('Pakai: node scripts/render.js <naskah.json> <out_dir>'); process.exit(1); }
+const [naskahArg, outArg] = process.argv.slice(2);
+if (!naskahArg || !outArg) { console.error('Pakai: node scripts/render.js <naskah.json> <out_dir>'); process.exit(1); }
 
+const naskahPath = path.resolve(naskahArg);
+const outDir = path.resolve(outArg);
 const data = JSON.parse(fs.readFileSync(naskahPath, 'utf8'));
 const WORKERS = Math.max(1, Math.min(2, require('os').cpus().length));
 const FPS = 30;

@@ -4,8 +4,9 @@
 const fs = require('fs');
 const path = require('path');
 const ROOT = path.resolve(__dirname, '..');
-const outDir = process.argv[2];
-if (!outDir) { console.error('Pakai: node scripts/build-page.js <out_dir>'); process.exit(1); }
+const outArg = process.argv[2];
+if (!outArg) { console.error('Pakai: node scripts/build-page.js <out_dir>'); process.exit(1); }
+const outDir = path.resolve(outArg);
 const hasil = JSON.parse(fs.readFileSync(path.join(outDir, 'hasil.json'), 'utf8'));
 
 const BULAN = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
