@@ -11,6 +11,7 @@ Repo ini dipakai oleh Claude saat menjalankan instruksi "WB Reels" di Project. T
 - `templates/reel.html`: tata letak bubble dan animasi (fade in/out, zoom pelan 3,5%).
 - `templates/minggu.html`: halaman mingguan berisi 7 video.
 - `scripts/render.js`: `node scripts/render.js <naskah.json> <out_dir>` merender semua reels jadi MP4 1080x1920 30fps tanpa audio.
+- `scripts/cek-alat.sh`: cek node, playwright + chromium, dan ffmpeg sebelum render (memasang ffmpeg lewat pip kalau tidak ada).
 - `scripts/build-page.js`: `node scripts/build-page.js <out_dir>` membangun `<out_dir>/halaman/` siap diterbitkan sebagai artifact.
 
 ## Format naskah.json
