@@ -30,7 +30,7 @@ const week = hasil.reels.map(r => {
   return {
     day: r.hari, date: `${t.d} ${BLN[t.m]}`, title: r.judul,
     file: r.file ? `reels/${r.file}` : null, poster: r.poster ? `reels/${r.poster}` : null, dur: r.durasi,
-    luka: r.luka,
+    luka: r.luka, tag: r.nomor ? `#CeritaTeduh${r.nomor}` : null,
     script: r.dialog.map(([w, x]) => [w === 'a' ? 'Anak Muda' : 'Gus', x])
   };
 });

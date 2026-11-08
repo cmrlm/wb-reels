@@ -89,7 +89,7 @@ WEEK.forEach((r, i) => {
   const video = el("video", { src: r.file, poster: r.poster, controls: "", playsinline: "", preload: "metadata" });
   card.appendChild(el("div", { class: "frame" }, video));
   card.appendChild(el("p", { class: "title", text: r.title }));
-  card.appendChild(el("p", { class: "meta", text: r.dur + " · MP4" }));
+  card.appendChild(el("p", { class: "meta", text: (r.tag ? r.tag + " · " : "") + r.dur + " · MP4" }));
 
   const note = el("div", { class: "note", "aria-live": "polite" });
   const saveBtn = el("button", { class: "primary", type: "button", id: "save-" + i, text: "Simpan video" });
@@ -108,7 +108,7 @@ WEEK.forEach((r, i) => {
       const dl = await getDownloads();
       if (!dl) { note.textContent = "Download tidak tersedia di tampilan ini. Buka halaman ini di claude.ai."; return; }
       const blob = await (await fetch(r.file)).blob();
-      const name = "WB " + r.date + " - " + r.title + ".mp4";
+      const name = (r.tag ? r.tag.replace("#", "") + " - " : "WB " + r.date + " - ") + r.title + ".mp4";
       const res = await dl.save({ filename: name, data: blob });
       note.textContent = res.status === "saved" ? "Tersimpan." : "";
     } catch (e) {

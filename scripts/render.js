@@ -21,6 +21,7 @@ function slug(s) { return s.toLowerCase().normalize('NFKD').replace(/[^a-z0-9]+/
 function validate(r, i) {
   const errs = [];
   const d = r.dialog || [];
+  if (!Number.isInteger(r.nomor) || r.nomor < 1) errs.push('"nomor" #CeritaTeduh belum diisi (harus angka bulat, contoh 110)');
   if (d.length < 9 || d.length > 17) errs.push(`jumlah baris ${d.length} (harus 9-17)`);
   if (d[0] && d[0][0] !== 'a') errs.push('baris pertama harus Anak Muda');
   if (d.length && d[d.length - 1][0] !== 'a') errs.push('baris terakhir harus Anak Muda');
@@ -34,12 +35,14 @@ function validate(r, i) {
 }
 
 async function renderOne(browser, r, i) {
-  const name = `${String(i + 1).padStart(2, '0')}-${slug(r.hari)}-${slug(r.judul)}`;
+  const name = `${String(i + 1).padStart(2, '0')}-ceritateduh${r.nomor}-${slug(r.judul)}`;
   const tmp = path.join(outDir, `${name}.tmp.mp4`);
   const final = path.join(outDir, `${name}.mp4`);
   const html = fs.readFileSync(path.join(ROOT, 'templates/reel.html'), 'utf8')
     .replace('__FONT__', 'file://' + path.join(ROOT, 'assets/fonts/lora-latin-400-normal.woff2'))
+    .replace('__FONT_I__', 'file://' + path.join(ROOT, 'assets/fonts/lora-latin-400-italic.woff2'))
     .replace('__PLATE__', 'file://' + path.join(ROOT, 'assets/plate.jpg'))
+    .replace('__TAG__', '#CeritaTeduh' + r.nomor)
     .replace('__LINES__', JSON.stringify(r.dialog));
   const htmlPath = path.join(outDir, `${name}.html`);
   fs.writeFileSync(htmlPath, html);

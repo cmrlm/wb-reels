@@ -7,8 +7,8 @@ Repo ini dipakai oleh Claude saat menjalankan instruksi "WB Reels" di Project. T
 ## Isi
 
 - `assets/plate.jpg`: latar 1080x1920 (Gus dan Anak Muda).
-- `assets/fonts/`: Lora (SIL Open Font License).
-- `templates/reel.html`: tata letak bubble dan animasi (fade in/out, zoom pelan 3,5%).
+- `assets/fonts/`: Lora regular dan italic (SIL Open Font License).
+- `templates/reel.html`: tata letak bubble, watermark #CeritaTeduh, animasi (fade in/out, zoom pelan 3,5%), dan kartu CTA penutup.
 - `templates/minggu.html`: halaman mingguan berisi 7 video.
 - `scripts/render.js`: `node scripts/render.js <naskah.json> <out_dir>` merender semua reels jadi MP4 1080x1920 30fps tanpa audio.
 - `scripts/cek-alat.sh`: cek node, playwright + chromium, dan ffmpeg sebelum render (memasang ffmpeg lewat pip kalau tidak ada).
@@ -20,14 +20,14 @@ Repo ini dipakai oleh Claude saat menjalankan instruksi "WB Reels" di Project. T
 {
   "minggu_mulai": "2026-11-09",
   "reels": [
-    { "hari": "Senin", "tanggal": "2026-11-09", "judul": "Tempat Cerita",
+    { "hari": "Senin", "tanggal": "2026-11-09", "nomor": 110, "judul": "Tempat Cerita",
       "luka": "Selalu jadi tempat curhat tapi tidak pernah ditanya balik", "wilayah": "Pertemanan",
       "dialog": [["a", "Gus, ..."], ["g", "..."], ["a", "Ah gitu ternyata, Gus. Terima kasih. :)"]] }
   ]
 }
 ```
 
-`a` = Anak Muda (bubble kiri, putih), `g` = Gus (bubble kanan, abu hangat). Aturan yang dicek `render.js`: 9-17 baris, dibuka dan ditutup Anak Muda, pembicara bergantian, maks 170 karakter per baris, tanpa em dash.
+`nomor` = angka watermark #CeritaTeduh di atas video (wajib). `a` = Anak Muda (bubble kiri, putih), `g` = Gus (bubble kanan, abu hangat). Setiap video ditutup kartu CTA 5 detik (“Komen ‘Teduh’ atau cek link di bio.”). Aturan yang dicek `render.js`: 9-17 baris, dibuka dan ditutup Anak Muda, pembicara bergantian, maks 170 karakter per baris, tanpa em dash.
 
 ## Butuh
 

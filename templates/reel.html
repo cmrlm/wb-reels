@@ -4,7 +4,8 @@
 <meta charset="utf-8">
 <title>Waktu Berteduh Reel</title>
 <style>
-@font-face{font-family:Lora;src:url(__FONT__) format("woff2");font-weight:400}
+@font-face{font-family:Lora;src:url(__FONT__) format("woff2");font-weight:400;font-style:normal}
+@font-face{font-family:Lora;src:url(__FONT_I__) format("woff2");font-weight:400;font-style:italic}
 html,body{margin:0;background:#f5f4f1}
 #stage{position:relative;width:1080px;height:1920px;overflow:hidden;background:#fafafa}
 #plate{position:absolute;inset:0;width:1080px;height:1920px;transform-origin:50% 62%}
@@ -15,26 +16,38 @@ html,body{margin:0;background:#f5f4f1}
 .a::after{left:52px}
 .g{right:63px;background:#f6f4f2}
 .g::after{right:52px}
+#tag{position:absolute;top:112px;left:0;right:0;text-align:center;font:400 36px/1 Lora,serif;letter-spacing:1.5px;color:#8b8783}
+#cta{position:absolute;inset:0;background:rgba(248,247,244,.88);opacity:0}
+#ctaText{position:absolute;left:90px;right:90px;top:650px;text-align:center;color:#2f2d2a}
+#ctaText p{margin:0;font:400 41px/1.62 Lora,serif}
+#ctaText p.i{font-style:italic;margin-top:30px}
 </style>
 </head>
 <body>
 <div id="stage">
   <img id="plate" src="__PLATE__">
   <div id="bubbles"></div>
+  <div id="cta"><div id="ctaText">
+    <p>Buat kamu yang pernah ngerasain ini,<br>aku udah siapin beberapa cerita lainnya<br>untuk menemani perasaanmu lebih lama.</p>
+    <p class="i">Komen “Teduh” atau cek link di bio.</p>
+  </div></div>
+  <div id="tag">__TAG__</div>
   <div id="veil"></div>
 </div>
 <script>
 const LINES = __LINES__;
 const START = 1.05, GAP = 0.25, FIN = 0.45, FOUT = 0.35;
+const CTA_IN = 0.6, CTA_HOLD = 5.0;
 let t0 = START;
 const T = LINES.map(([who, text], i) => {
   let d = Math.min(8, Math.max(2.6, 1.5 + 0.05 * text.length));
-  if (i === LINES.length - 1) d = 4.2;
+  if (i === LINES.length - 1) d = 3.6;
   const o = { who, text, s: t0, e: t0 + d };
   t0 += d + GAP;
   return o;
 });
-const TOTAL = T[T.length - 1].e + 0.3;
+const CTA_S = T[T.length - 1].e + 0.15;
+const TOTAL = CTA_S + CTA_IN + CTA_HOLD;
 const host = document.getElementById('bubbles');
 const els = T.map(l => {
   const el = document.createElement('div');
@@ -57,6 +70,9 @@ function setTime(t) {
     els[i].style.opacity = op;
     els[i].style.transform = `translateY(${dy}px)`;
   });
+  const c = Math.max(0, Math.min(1, (t - CTA_S) / CTA_IN));
+  document.getElementById('cta').style.opacity = ease(c);
+  document.getElementById('ctaText').style.transform = `translateY(${12 * (1 - ease(c))}px)`;
 }
 window.TOTAL = TOTAL; window.TIMING = T; window.setTime = setTime;
 setTime(0);
