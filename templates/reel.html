@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<title>Waktu Berteduh Reel</title>
+<style>
+@font-face{font-family:Lora;src:url(__FONT__) format("woff2");font-weight:400}
+html,body{margin:0;background:#f5f4f1}
+#stage{position:relative;width:1080px;height:1920px;overflow:hidden;background:#fafafa}
+#plate{position:absolute;inset:0;width:1080px;height:1920px;transform-origin:50% 62%}
+#veil{position:absolute;inset:0;background:#f5f4f1}
+.b{position:absolute;bottom:1001px;max-width:610px;padding:30px 34px;border-radius:32px;font:400 34.5px/1.6 Lora,serif;color:#2b2b2b;box-shadow:0 6px 22px rgba(0,0,0,.06);opacity:0}
+.b::after{content:"";position:absolute;bottom:-11px;width:22px;height:22px;background:inherit;transform:rotate(45deg);border-radius:3px}
+.a{left:63px;background:#fff}
+.a::after{left:52px}
+.g{right:63px;background:#f6f4f2}
+.g::after{right:52px}
+</style>
+</head>
+<body>
+<div id="stage">
+  <img id="plate" src="__PLATE__">
+  <div id="bubbles"></div>
+  <div id="veil"></div>
+</div>
+<script>
+const LINES = __LINES__;
+const START = 1.05, GAP = 0.25, FIN = 0.45, FOUT = 0.35;
+let t0 = START;
+const T = LINES.map(([who, text], i) => {
+  let d = Math.min(8, Math.max(2.6, 1.5 + 0.05 * text.length));
+  if (i === LINES.length - 1) d = 4.2;
+  const o = { who, text, s: t0, e: t0 + d };
+  t0 += d + GAP;
+  return o;
+});
+const TOTAL = T[T.length - 1].e + 0.3;
+const host = document.getElementById('bubbles');
+const els = T.map(l => {
+  const el = document.createElement('div');
+  el.className = 'b ' + l.who;
+  el.textContent = l.text;
+  host.appendChild(el);
+  return el;
+});
+const ease = x => 1 - Math.pow(1 - x, 3);
+function setTime(t) {
+  document.getElementById('plate').style.transform = `scale(${1 + 0.035 * Math.min(1, t / TOTAL)})`;
+  document.getElementById('veil').style.opacity = Math.max(0, 1 - t / 1.0);
+  T.forEach((l, i) => {
+    let op = 0, dy = 0;
+    if (t >= l.s && t <= l.e) {
+      if (t < l.s + FIN) { const p = ease((t - l.s) / FIN); op = p; dy = 10 * (1 - p); }
+      else if (t > l.e - FOUT) { op = (l.e - t) / FOUT; }
+      else op = 1;
+    }
+    els[i].style.opacity = op;
+    els[i].style.transform = `translateY(${dy}px)`;
+  });
+}
+window.TOTAL = TOTAL; window.TIMING = T; window.setTime = setTime;
+setTime(0);
+</script>
+</body>
+</html>

@@ -1,0 +1,132 @@
+<title>__TITLE__</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400&family=Figtree:wght@400;500;600&display=swap">
+<style>
+/* Layout: a quiet weekly shelf. Header, then one card per day in a wrapping grid, each card a 9:16 reel with its actions. */
+:root{
+  --bg:#f6f5f2; --surface:#ffffff; --ink:#2b2a28; --muted:#6a6660; --line:#e4e1db; --soft:#efede8; --accent:#4f5d52;
+  --display:"Lora",Georgia,serif; --body:"Figtree",system-ui,sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#1a1a19; --surface:#242422; --ink:#ecebe7; --muted:#a39f97; --line:#363532; --soft:#2c2b29; --accent:#a9b8ab; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#1a1a19; --surface:#242422; --ink:#ecebe7; --muted:#a39f97; --line:#363532; --soft:#2c2b29; --accent:#a9b8ab; color-scheme:dark}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.55}
+.wrap{max-width:1180px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:32px 64px;display:flex;flex-direction:column;gap:28px}
+.demo{align-self:flex-start;font-size:12.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);border:1px dashed var(--line);border-radius:999px;padding:4px 12px}
+header{display:flex;flex-direction:column;gap:6px}
+.eyebrow{font-size:12.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+h1{font-family:var(--display);font-weight:600;font-size:clamp(28px,4.4vw,40px);line-height:1.15;margin:0;text-wrap:balance}
+.sub{color:var(--muted);margin:0;max-width:62ch}
+.status{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px}
+.chip{font-size:13px;padding:4px 10px;border-radius:999px;background:var(--soft);color:var(--ink)}
+.chip b{font-weight:600;font-variant-numeric:tabular-nums}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:20px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:14px;display:flex;flex-direction:column;gap:12px;min-width:0}
+.day{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.day strong{font-weight:600}
+.day span{color:var(--muted);font-size:13px;font-variant-numeric:tabular-nums}
+.frame{aspect-ratio:9/16;max-width:100%;border-radius:10px;overflow:hidden;background:var(--soft)}
+.frame video{width:100%;height:100%;display:block;object-fit:cover;background:#fafafa}
+.empty{display:flex;align-items:center;justify-content:center;text-align:center;padding:20px;border:1px dashed var(--line);background:transparent;color:var(--muted);font-size:13.5px}
+.title{font-family:var(--display);font-size:19px;line-height:1.3;margin:0}
+.title.muted{color:var(--muted);font-style:italic;font-weight:400}
+.meta{color:var(--muted);font-size:13px;margin:-6px 0 0}
+.actions{display:flex;flex-wrap:wrap;gap:8px}
+button{font:500 14px/1 var(--body);border-radius:10px;padding:11px 14px;min-height:44px;cursor:pointer;border:1px solid var(--line);background:var(--surface);color:var(--ink)}
+button.primary{background:var(--accent);border-color:var(--accent);color:var(--surface)}
+button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+button:disabled{opacity:.5;cursor:default}
+details{border-top:1px solid var(--line);padding-top:10px}
+summary{cursor:pointer;color:var(--muted);font-size:13.5px}
+.script{display:flex;flex-direction:column;gap:8px;margin-top:10px;font-family:var(--display);font-size:14.5px;line-height:1.5}
+.script p{margin:0}
+.script .who{font-family:var(--body);font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);display:block}
+.note{font-size:13px;color:var(--muted);min-height:1.2em}
+footer{color:var(--muted);font-size:13px;border-top:1px solid var(--line);padding-top:16px}
+@media (prefers-reduced-motion: reduce){*{transition:none!important}}
+</style>
+
+<div class="wrap">
+  <header>
+    <span class="eyebrow">Waktu Berteduh · Reels mingguan</span>
+    <h1>__RANGE__</h1>
+    <p class="sub">Semua reels yang sudah di-approve untuk minggu depan. Tap Simpan video untuk download MP4, lalu upload ke IG dengan musik seperti biasa. Naskah lengkap ada di bawah tiap video untuk bahan caption.</p>
+    <div class="status">
+      <span class="chip"><b>__COUNT__</b> reels siap upload</span>
+      <span class="chip">1080×1920 · tanpa musik</span>
+    </div>
+  </header>
+
+  <main class="grid" id="grid"></main>
+
+  <footer>Dibuat otomatis dari naskah yang di-approve. Halaman ini privat sampai dibagikan lewat menu Share.</footer>
+</div>
+
+<script>
+const WEEK = __WEEK__;
+
+const grid = document.getElementById("grid");
+let downloadsP = null;
+function getDownloads(){ if(!downloadsP){ downloadsP = window.claude?.use ? window.claude.use("downloads") : Promise.resolve(null); } return downloadsP; }
+
+function el(tag, attrs, ...kids){
+  const n = document.createElement(tag);
+  for (const [k,v] of Object.entries(attrs||{})) { if (k === "class") n.className = v; else if (k === "text") n.textContent = v; else n.setAttribute(k, v); }
+  kids.forEach(k => k && n.appendChild(k));
+  return n;
+}
+
+WEEK.forEach((r, i) => {
+  const card = el("article", { class: "card" });
+  card.appendChild(el("div", { class: "day" }, el("strong", { text: r.day }), el("span", { text: r.date })));
+  if (!r.file) {
+    card.appendChild(el("div", { class: "frame empty", text: "Belum ada reels untuk hari ini." }));
+    card.appendChild(el("p", { class: "title muted", text: "Belum ada reels" }));
+    grid.appendChild(card);
+    return;
+  }
+  const video = el("video", { src: r.file, poster: r.poster, controls: "", playsinline: "", preload: "metadata" });
+  card.appendChild(el("div", { class: "frame" }, video));
+  card.appendChild(el("p", { class: "title", text: r.title }));
+  card.appendChild(el("p", { class: "meta", text: r.dur + " · MP4" }));
+
+  const note = el("div", { class: "note", "aria-live": "polite" });
+  const saveBtn = el("button", { class: "primary", type: "button", id: "save-" + i, text: "Simpan video" });
+  const copyBtn = el("button", { type: "button", id: "copy-" + i, text: "Salin naskah" });
+  card.appendChild(el("div", { class: "actions" }, saveBtn, copyBtn));
+  card.appendChild(note);
+
+  const scriptText = r.script.map(([w, t]) => w + ": " + t).join("\n");
+  const list = el("div", { class: "script" });
+  r.script.forEach(([w, t]) => list.appendChild(el("p", {}, el("span", { class: "who", text: w }), document.createTextNode(t))));
+  card.appendChild(el("details", {}, el("summary", { text: "Lihat naskah" }), list));
+
+  saveBtn.addEventListener("click", async () => {
+    saveBtn.disabled = true; note.textContent = "Menyiapkan file…";
+    try {
+      const dl = await getDownloads();
+      if (!dl) { note.textContent = "Download tidak tersedia di tampilan ini. Buka halaman ini di claude.ai."; return; }
+      const blob = await (await fetch(r.file)).blob();
+      const name = "WB " + r.date + " - " + r.title + ".mp4";
+      const res = await dl.save({ filename: name, data: blob });
+      note.textContent = res.status === "saved" ? "Tersimpan." : "";
+    } catch (e) {
+      const code = e && e.code;
+      note.textContent = code === "declined" ? "" : code === "rate_limited" ? "Masih ada konfirmasi yang terbuka. Coba lagi sebentar." : "Gagal menyimpan. Coba lagi.";
+    } finally { saveBtn.disabled = false; }
+  });
+
+  copyBtn.addEventListener("click", () => {
+    navigator.clipboard.writeText(scriptText)
+      .then(() => { note.textContent = "Naskah tersalin."; })
+      .catch(() => {
+        const d = card.querySelector("details"); d.open = true;
+        const range = document.createRange(); range.selectNodeContents(list);
+        const sel = window.getSelection(); sel.removeAllRanges(); sel.addRange(range);
+        note.textContent = "Naskah sudah diblok, salin manual.";
+      });
+  });
+  grid.appendChild(card);
+});
+</script>
